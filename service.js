@@ -3,11 +3,6 @@ import fetch from 'node-fetch'
 import express from 'express'
 import fs from  'fs'
 import bodyParser from 'body-parser'
-// const express = require('express');
-// const fs = require('fs');
-// // const fetch = require('node-fetch'); // node 18+ bisa pakai global fetch
-// const bodyParser = require('body-parser');
-
 const app = express();
 app.use(bodyParser.json());
 app.use(express.static('public')); // serve halaman frontend
