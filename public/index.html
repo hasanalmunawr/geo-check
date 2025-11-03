@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Connection Check</title>
+  <style>
+    body {
+      background: #F6F8FB;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      color: #1A1E24;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin:0;
+    }
+
+    h2 {
+      color: #2D5AE0;
+      font-size: 28px;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 15px;
+      opacity: .75;
+    }
+
+    #btn {
+      background: #2D5AE0;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: 0.25s ease;
+    }
+
+    #btn:hover {
+      background: #2348B2;
+    }
+
+    #out {
+      margin-top: 25px;
+      width: 60%;
+      background: white;
+      border: 1px solid #DCE1EB;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #2C3645;
+      white-space: pre-wrap;
+      max-height: 280px;
+      overflow-y: auto;
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+    }
+  </style>
+</head>
+<body>
+<h2>Connection Check</h2>
+<p>Click the button to send your Connection to the server.</p>
+<button id="btn">Click to check</button>
+<pre id="out"></pre>
+
+<script>
+  const out = document.getElementById('out');
+  document.getElementById('btn').addEventListener('click', async () => {
+    out.textContent = 'Fetching IP & geo...';
+    try {
+      // ambil data geo dari layanan publik
+      const r = await fetch('https://ipapi.co/json/');
+      if (!r.ok) throw new Error('geo provider error ' + r.status);
+      const geo = await r.json();
+      // struktur geo (contoh) -> { ip, city, region, country, country_name, latitude, longitude, ... }
+
+      const payload = {
+        ip: geo.ip,
+        country: geo.country,       // kode negara seperti "MY"
+        country_name: geo.country_name,
+        city: geo.city,
+        region: geo.region,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+        userAgent: navigator.userAgent
+      };
+
+      out.textContent = 'Sending to server: .......';
+
+      // kirim ke servermu
+      await fetch('/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      out.textContent += '\n\nSent. Check server logs or geo_logs.txt';
+    } catch (e) {
+      out.textContent = 'Error: ' + e.message;
+    }
+  });
+</script>
+</body>
+</html>
